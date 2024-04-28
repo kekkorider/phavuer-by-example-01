@@ -3,6 +3,7 @@ import { Game } from 'phavuer'
 
 import PreloadScene from './scenes/Preload.vue'
 import MainScene from './scenes/Main.vue'
+import GameOverScene from './scenes/GameOver.vue'
 
 const config = {
 	width: 600,
@@ -29,5 +30,6 @@ const config = {
 	<Game :config="config">
 		<PreloadScene :autoStart="true" />
 		<MainScene :autoStart="false" />
+		<GameOverScene :autoStart="false" />
 	</Game>
 </template>
