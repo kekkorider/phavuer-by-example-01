@@ -26,7 +26,7 @@ function onCreate(scene) {
 		Object.assign(cloudTweens.value, {
 			[uuid]: {
 				props: {
-					x: { getEnd: () => 50 },
+					x: { getEnd: () => -100 },
 				},
 				duration: 2000 / alpha,
 				onComplete: () => {
@@ -51,7 +51,7 @@ function onCreate(scene) {
 		Object.assign(obstaclesTweens.value, {
 			[uuid]: {
 				props: {
-					x: { getEnd: () => 50 },
+					x: { getEnd: () => -100 },
 				},
 				duration: 2000,
 				onComplete: () => {
