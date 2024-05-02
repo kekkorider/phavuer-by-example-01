@@ -8,6 +8,7 @@ import Generator from '../assets/Generator'
 import Player from '../components/Player.vue'
 import Cloud from '../components/Cloud.vue'
 import Obstacle from '../components/Obstacle.vue'
+import Coin from '../components/Coin.vue'
 
 const game = useGame()
 
@@ -16,6 +17,9 @@ const cloudTweens = ref({})
 
 const obstacles = ref([])
 const obstaclesTweens = ref({})
+
+const coins = ref([])
+const coinTweens = ref({})
 
 function onCreate(scene) {
 	// Clouds generation
@@ -67,6 +71,30 @@ function onCreate(scene) {
 		})
 	})
 
+	// Coins generation
+	scene.events.on(EVENTS.GENERATE_COIN, () => {
+		const uuid = Phaser.Math.RND.uuid()
+
+		Object.assign(coinTweens.value, {
+			[uuid]: {
+				props: {
+					x: { getEnd: () => 50 },
+				},
+				duration: 2000,
+				onComplete: () => {
+					destroyCoin(uuid)
+				},
+			},
+		})
+
+		coins.value.push({
+			x: 820,
+			y: game.scale.height - 64,
+			alpha: 1 / Phaser.Math.Between(1, 3),
+			uuid,
+		})
+	})
+
 	new Generator(scene)
 }
 
@@ -78,6 +106,11 @@ function destroyCloud(uuid) {
 function destroyObstacle(uuid) {
 	obstacles.value = obstacles.value.filter(obstacle => obstacle.uuid !== uuid)
 	delete obstaclesTweens.value[uuid]
+}
+
+function destroyCoin(uuid) {
+	coins.value = coins.value.filter(coin => coin.uuid !== uuid)
+	delete coinTweens.value[uuid]
 }
 </script>
 
@@ -101,6 +134,14 @@ function destroyObstacle(uuid) {
 			:y="obstacle.y"
 			:tween="obstaclesTweens[obstacle.uuid]"
 			:key="obstacle.uuid"
+		/>
+
+		<Coin
+			v-for="coin in coins"
+			:x="coin.x"
+			:y="coin.y"
+			:tween="coinTweens[coin.uuid]"
+			:key="coin.uuid"
 		/>
 	</Scene>
 </template>

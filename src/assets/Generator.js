@@ -12,6 +12,7 @@ export default class Generator {
 
     this.generateCloud()
     this.generateObstacle()
+    this.generateCoin()
   }
 
   generateCloud() {
