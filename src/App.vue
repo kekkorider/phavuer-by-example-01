@@ -8,7 +8,7 @@ import GameOverScene from './scenes/GameOver.vue'
 const config = {
 	width: 600,
 	height: 300,
-	backgroundColor: 0x181818,
+	backgroundColor: 0x87ceeb,
 	gameTitle: 'Phavuer Starter',
 	gameVersion: '0.1.0',
 	transparent: false,
