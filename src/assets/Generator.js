@@ -11,6 +11,7 @@ export default class Generator {
     console.log('Generator initialized')
 
     this.generateCloud()
+    this.generateObstacle()
   }
 
   generateCloud() {

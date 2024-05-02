@@ -1,22 +1,9 @@
 <script setup>
-import { Rectangle, refObj } from 'phavuer'
-import { watch } from 'vue'
+import { Rectangle } from 'phavuer'
 
-const props = defineProps({
-	uuid: {
-		type: String,
-		required: true,
-	},
-})
-
-const cloudRef = refObj()
-
-const cloudWatcher = watch(cloudRef, value => {
-	value.uuid = props.uuid
-	cloudWatcher()
-})
+defineEmits(['destroy'])
 </script>
 
 <template>
-	<Rectangle :fillColor="0xffffff" :width="98" :height="32" ref="cloudRef" />
+	<Rectangle :fillColor="0xffffff" :width="98" :height="32" />
 </template>
