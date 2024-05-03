@@ -5,9 +5,14 @@ export const SCENES = Object.freeze({
 })
 
 export const EVENTS = Object.freeze({
-  GENERATE_CLOUD: 'generate:cloud',
-  DESTROY_CLOUD: 'destroy:cloud',
+  CREATED_PLAYER: 'player:created',
 
-  GENERATE_OBSTACLE: 'generate:obstacle',
-  GENERATE_COIN: 'generate:coin',
+  GENERATE_CLOUD: 'cloud:generate',
+  DESTROY_CLOUD: 'cloud:destroy',
+
+  GENERATE_OBSTACLE: 'obstacle:generate',
+  CREATED_OBSTACLE: 'obstacle:created',
+
+  GENERATE_COIN: 'coin:generate',
+  CREATED_COIN: 'coin:created',
 })

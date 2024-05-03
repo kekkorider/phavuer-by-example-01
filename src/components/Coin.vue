@@ -2,6 +2,8 @@
 import { Sprite, useScene, refObj, Body } from 'phavuer'
 import { watch } from 'vue'
 
+import { EVENTS } from '../constants'
+
 const scene = useScene()
 const coinRef = refObj()
 
@@ -20,10 +22,14 @@ const coinWatcher = watch(coinRef, value => {
 	value.body.setAllowGravity(false)
 	coinWatcher()
 })
+
+function onCreate(elem) {
+	scene.events.emit(EVENTS.CREATED_COIN, elem)
+}
 </script>
 
 <template>
-	<Sprite :texture="'coin'" play="coinSpin" ref="coinRef">
+	<Sprite :texture="'coin'" play="coinSpin" ref="coinRef" @create="onCreate">
 		<Body />
 	</Sprite>
 </template>

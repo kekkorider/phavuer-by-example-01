@@ -1,6 +1,6 @@
 <script setup>
 import { Scene, useGame } from 'phavuer'
-import { ref } from 'vue'
+import { ref, shallowRef } from 'vue'
 
 import { SCENES, EVENTS } from '../constants'
 import Generator from '../assets/Generator'
@@ -11,6 +11,8 @@ import Obstacle from '../components/Obstacle.vue'
 import Coin from '../components/Coin.vue'
 
 const game = useGame()
+const score = shallowRef(0)
+const scoreText = shallowRef(null)
 
 const clouds = ref([])
 const cloudTweens = ref({})
@@ -21,7 +23,56 @@ const obstaclesTweens = ref({})
 const coins = ref([])
 const coinTweens = ref({})
 
+let obstaclesGroup, coinsGroup, updateScoreEvent
+
+const sounds = {
+	coin: null,
+	theme: null,
+}
+
+function onUpdate(scene) {}
+
+function onPreload(scene) {
+	sounds.coin = scene.sound.add('audio_coin')
+	sounds.theme = scene.sound.add('audio_theme', { loop: true })
+	sounds.dead = scene.sound.add('audio_dead')
+}
+
 function onCreate(scene) {
+	obstaclesGroup = scene.add.group()
+	coinsGroup = scene.add.group()
+
+	updateScoreEvent = scene.time.addEvent({
+		delay: 100,
+		callback: () => updateScore(),
+		callbackScope: scene,
+		loop: true,
+	})
+
+	sounds.theme.play()
+
+	scoreText.value = scene.add.bitmapText(
+		game.scale.width * 0.5,
+		10,
+		'bmfont_arcade',
+		score.value,
+		20
+	)
+
+	scoreText.value.setOrigin(0.5, 0)
+
+	scene.events.once(EVENTS.CREATED_PLAYER, elem => {
+		scene.physics.add.collider(
+			elem,
+			obstaclesGroup,
+			hitObstacle,
+			() => true,
+			scene
+		)
+
+		scene.physics.add.overlap(elem, coinsGroup, hitCoin, () => true, scene)
+	})
+
 	// Clouds generation
 	scene.events.on(EVENTS.GENERATE_CLOUD, () => {
 		const alpha = 1 / Phaser.Math.Between(1, 3)
@@ -71,6 +122,10 @@ function onCreate(scene) {
 		})
 	})
 
+	scene.events.on(EVENTS.CREATED_OBSTACLE, elem => {
+		obstaclesGroup.add(elem)
+	})
+
 	// Coins generation
 	scene.events.on(EVENTS.GENERATE_COIN, () => {
 		const uuid = Phaser.Math.RND.uuid()
@@ -95,6 +150,10 @@ function onCreate(scene) {
 		})
 	})
 
+	scene.events.on(EVENTS.CREATED_COIN, elem => {
+		coinsGroup.add(elem)
+	})
+
 	new Generator(scene)
 }
 
@@ -112,11 +171,32 @@ function destroyCoin(uuid) {
 	coins.value = coins.value.filter(coin => coin.uuid !== uuid)
 	delete coinTweens.value[uuid]
 }
+
+function hitObstacle() {
+	updateScoreEvent.destroy()
+	console.log('hitObstacle')
+}
+
+function hitCoin(player, coin) {
+	sounds.coin.play()
+	updateScore(1000)
+	coin.destroy()
+}
+
+function updateScore(points = 1) {
+	score.value += points
+	scoreText.value.setText(score.value)
+}
 </script>
 
 <template>
-	<Scene :name="SCENES.MAIN" @create="onCreate">
-		<Player :x="300" :y="150" />
+	<Scene
+		:name="SCENES.MAIN"
+		@preload="onPreload"
+		@create="onCreate"
+		@update="onUpdate"
+	>
+		<Player :x="game.scale.width * 0.5 - 100" :y="game.scale.height - 200" />
 
 		<Cloud
 			v-for="cloud in clouds"
