@@ -1,6 +1,6 @@
 <script setup>
-import { Rectangle, Body, refObj, useScene } from 'phavuer'
-import { watch } from 'vue'
+import { Image, Body, refObj, useScene } from 'phavuer'
+import { watch, ref } from 'vue'
 
 import { EVENTS } from '../constants'
 
@@ -11,12 +11,14 @@ defineEmits(['destroy'])
 //
 const scene = useScene()
 const obstacleRef = refObj()
+const bodyEnabled = ref(true)
 
 //
 // Watchers
 //
 const obstacleWatcher = watch(obstacleRef, value => {
 	value.body.setAllowGravity(false)
+	value.name = 'Obstacle'
 	obstacleWatcher()
 })
 
@@ -29,13 +31,13 @@ function onCreate(elem) {
 </script>
 
 <template>
-	<Rectangle
-		:fillColor="0xff0000"
-		:width="32"
-		:height="32"
+	<Image
+		texture="pino"
+		:display-width="32"
+		:display-height="64"
 		ref="obstacleRef"
 		@create="onCreate"
 	>
-		<Body />
-	</Rectangle>
+		<Body :enable="bodyEnabled" />
+	</Image>
 </template>

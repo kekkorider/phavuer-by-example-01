@@ -1,6 +1,6 @@
 <script setup>
 import { Sprite, useScene, refObj, Body } from 'phavuer'
-import { watch } from 'vue'
+import { watch, ref } from 'vue'
 
 import { EVENTS } from '../constants'
 
@@ -9,6 +9,7 @@ import { EVENTS } from '../constants'
 //
 const scene = useScene()
 const coinRef = refObj()
+const bodyEnabled = ref(true)
 
 // Create the spin animation only if it doesn't exist yet
 !!!scene.anims.anims.entries.coinSpin &&
@@ -40,6 +41,6 @@ function onCreate(elem) {
 
 <template>
 	<Sprite :texture="'coin'" play="coinSpin" ref="coinRef" @create="onCreate">
-		<Body />
+		<Body :enable="bodyEnabled" />
 	</Sprite>
 </template>

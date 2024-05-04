@@ -1,6 +1,6 @@
 <script setup>
 import { Rectangle, Body, refObj, useScene, onPreUpdate } from 'phavuer'
-import { watch } from 'vue'
+import { watch, ref } from 'vue'
 
 import { EVENTS } from '../constants'
 
@@ -9,6 +9,7 @@ import { EVENTS } from '../constants'
 //
 const scene = useScene()
 const player = refObj()
+const bodyEnabled = ref(true)
 
 //
 // Misc
@@ -39,7 +40,7 @@ const playerWatcher = watch(player, value => {
 onPreUpdate(() => {
 	if (Phaser.Input.Keyboard.JustDown(spaceKey)) {
 		jump()
-	} else if (player.value.body.blocked.down) {
+	} else if (player.value.body?.blocked?.down) {
 		jumpTween?.stop()
 		player.value.rotation = 0
 	}
@@ -63,7 +64,7 @@ function onCreate(elem) {
 function jump() {
 	if (!player.value.body.blocked.down) return
 
-	player.value.body.setVelocityY(-300)
+	player.value.body.setVelocityY(-350)
 	sounds.jump.play()
 
 	jumpTween = scene.tweens.add({
@@ -83,6 +84,6 @@ function jump() {
 		ref="player"
 		@create="onCreate"
 	>
-		<Body :collideWorldBounds="true" :dragY="10" />
+		<Body :collideWorldBounds="true" :enable="bodyEnabled" :dragY="10" />
 	</Rectangle>
 </template>

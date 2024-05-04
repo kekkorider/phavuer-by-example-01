@@ -14,5 +14,5 @@ export const EVENTS = Object.freeze({
   CREATED_OBSTACLE: 'obstacle:created',
 
   GENERATE_COIN: 'coin:generate',
-  CREATED_COIN: 'coin:created',
+  CREATED_COIN: 'coin:created'
 })

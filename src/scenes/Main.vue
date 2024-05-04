@@ -1,5 +1,5 @@
 <script setup>
-import { Scene, useGame } from 'phavuer'
+import { Scene, useGame, refScene } from 'phavuer'
 import { ref, shallowRef } from 'vue'
 
 import { SCENES, EVENTS } from '../constants'
@@ -14,6 +14,7 @@ import Coin from '../components/Coin.vue'
 // Refs
 //
 const game = useGame()
+const sceneRef = refScene()
 const score = shallowRef(0)
 const scoreText = shallowRef(null)
 
@@ -29,7 +30,12 @@ const coinTweens = ref({})
 //
 // Misc
 //
-let obstaclesGroup, coinsGroup, updateScoreEvent
+let generator,
+	obstaclesGroup,
+	coinsGroup,
+	updateScoreEvent,
+	playerObstaclesCollider,
+	playerCoinsCollider
 
 const sounds = {
 	coin: null,
@@ -46,11 +52,12 @@ function onPreload(scene) {
 }
 
 function onCreate(scene) {
-	console.log(scene)
+	game.registry.set('score', 0)
+	score.value = game.registry.get('score')
 
 	// Create physics group
-	obstaclesGroup = scene.add.group()
-	coinsGroup = scene.add.group()
+	obstaclesGroup = scene.physics.add.group()
+	coinsGroup = scene.physics.add.group()
 
 	// Timer event that updates the score every 100ms
 	updateScoreEvent = scene.time.addEvent({
@@ -76,15 +83,23 @@ function onCreate(scene) {
 
 	// Define the collision between the player and the obstacles/coins once it is created
 	scene.events.once(EVENTS.CREATED_PLAYER, elem => {
-		scene.physics.add.collider(
+		playerObstaclesCollider = scene.physics.add.collider(
 			elem,
 			obstaclesGroup,
 			hitObstacle,
 			() => true,
-			scene
+			scene,
+			false
 		)
 
-		scene.physics.add.overlap(elem, coinsGroup, hitCoin, () => true, scene)
+		playerCoinsCollider = scene.physics.add.overlap(
+			elem,
+			coinsGroup,
+			hitCoin,
+			() => true,
+			scene,
+			true
+		)
 	})
 
 	// Clouds generation
@@ -108,7 +123,7 @@ function onCreate(scene) {
 			x: 800,
 			y: Phaser.Math.Between(0, 100),
 			alpha,
-			scale: alpha,
+			scale: alpha * 1.7,
 			uuid,
 		})
 	})
@@ -168,7 +183,7 @@ function onCreate(scene) {
 		coinsGroup.add(elem)
 	})
 
-	new Generator(scene)
+	generator = new Generator(scene)
 }
 
 //
@@ -189,8 +204,9 @@ function destroyCoin(uuid) {
 	delete coinTweens.value[uuid]
 }
 
-function hitObstacle() {
+function hitObstacle(player, obstacle) {
 	updateScoreEvent.destroy()
+	gameOver()
 }
 
 function hitCoin(player, coin) {
@@ -203,6 +219,32 @@ function updateScore(points = 1) {
 	score.value += points
 	scoreText.value.setText(score.value)
 }
+
+function gameOver() {
+	sceneRef.value.events.off(EVENTS.GENERATE_CLOUD)
+	sceneRef.value.events.off(EVENTS.GENERATE_OBSTACLE)
+	sceneRef.value.events.off(EVENTS.GENERATE_COIN)
+
+	playerCoinsCollider.destroy()
+	playerObstaclesCollider.destroy()
+
+	generator.destroy()
+
+	clouds.value = []
+	cloudTweens.value = {}
+	coins.value = []
+	coinTweens.value = {}
+	obstacles.value = []
+	obstaclesTweens.value = {}
+
+	sounds.theme.stop()
+	sounds.dead.play()
+
+	game.registry.set('score', score.value)
+
+	game.scene.start(SCENES.GAME_OVER)
+	game.scene.stop(SCENES.MAIN)
+}
 </script>
 
 <template>
@@ -210,9 +252,9 @@ function updateScore(points = 1) {
 		:name="SCENES.MAIN"
 		@preload="onPreload"
 		@create="onCreate"
-		@update="onUpdate"
+		ref="sceneRef"
 	>
-		<Player :x="game.scale.width * 0.5 - 100" :y="game.scale.height - 200" />
+		<Player :x="game.scale.width * 0.5 - 100" :y="game.scale.height * 0.5" />
 
 		<Cloud
 			v-for="cloud in clouds"

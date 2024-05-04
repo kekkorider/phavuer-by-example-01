@@ -2,17 +2,18 @@ import { EVENTS } from '../constants.js'
 
 export default class Generator {
   constructor(scene) {
-    this.scene = scene;
+    this.scene = scene
 
     this.scene.time.delayedCall(2000, this.init, null, this)
   }
 
   init() {
-    console.log('Generator initialized')
-
     this.generateCloud()
     this.generateObstacle()
     this.generateCoin()
+  }
+
+  destroy() {
   }
 
   generateCloud() {

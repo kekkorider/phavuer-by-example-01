@@ -1,9 +1,9 @@
 <script setup>
-import { Rectangle } from 'phavuer'
+import { Image } from 'phavuer'
 
 defineEmits(['destroy'])
 </script>
 
 <template>
-	<Rectangle :fillColor="0xffffff" :width="98" :height="32" />
+	<Image texture="cloud" :display-width="64" :display-height="32" />
 </template>
