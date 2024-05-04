@@ -4,9 +4,13 @@ import { watch } from 'vue'
 
 import { EVENTS } from '../constants'
 
+//
+// Refs
+//
 const scene = useScene()
 const coinRef = refObj()
 
+// Create the spin animation only if it doesn't exist yet
 !!!scene.anims.anims.entries.coinSpin &&
 	scene.anims.create({
 		key: 'coinSpin',
@@ -18,11 +22,17 @@ const coinRef = refObj()
 		repeat: -1,
 	})
 
+//
+// Watchers
+//
 const coinWatcher = watch(coinRef, value => {
 	value.body.setAllowGravity(false)
 	coinWatcher()
 })
 
+//
+// Methods
+//
 function onCreate(elem) {
 	scene.events.emit(EVENTS.CREATED_COIN, elem)
 }

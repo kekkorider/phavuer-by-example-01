@@ -10,6 +10,9 @@ import Cloud from '../components/Cloud.vue'
 import Obstacle from '../components/Obstacle.vue'
 import Coin from '../components/Coin.vue'
 
+//
+// Refs
+//
 const game = useGame()
 const score = shallowRef(0)
 const scoreText = shallowRef(null)
@@ -23,6 +26,9 @@ const obstaclesTweens = ref({})
 const coins = ref([])
 const coinTweens = ref({})
 
+//
+// Misc
+//
 let obstaclesGroup, coinsGroup, updateScoreEvent
 
 const sounds = {
@@ -30,8 +36,9 @@ const sounds = {
 	theme: null,
 }
 
-function onUpdate(scene) {}
-
+//
+// Methods
+//
 function onPreload(scene) {
 	sounds.coin = scene.sound.add('audio_coin')
 	sounds.theme = scene.sound.add('audio_theme', { loop: true })
@@ -39,9 +46,13 @@ function onPreload(scene) {
 }
 
 function onCreate(scene) {
+	console.log(scene)
+
+	// Create physics group
 	obstaclesGroup = scene.add.group()
 	coinsGroup = scene.add.group()
 
+	// Timer event that updates the score every 100ms
 	updateScoreEvent = scene.time.addEvent({
 		delay: 100,
 		callback: () => updateScore(),
@@ -49,8 +60,10 @@ function onCreate(scene) {
 		loop: true,
 	})
 
+	// Play main music
 	sounds.theme.play()
 
+	// Add bitmap text for the score
 	scoreText.value = scene.add.bitmapText(
 		game.scale.width * 0.5,
 		10,
@@ -61,6 +74,7 @@ function onCreate(scene) {
 
 	scoreText.value.setOrigin(0.5, 0)
 
+	// Define the collision between the player and the obstacles/coins once it is created
 	scene.events.once(EVENTS.CREATED_PLAYER, elem => {
 		scene.physics.add.collider(
 			elem,
@@ -157,6 +171,9 @@ function onCreate(scene) {
 	new Generator(scene)
 }
 
+//
+// Methods
+//
 function destroyCloud(uuid) {
 	clouds.value = clouds.value.filter(cloud => cloud.uuid !== uuid)
 	delete cloudTweens.value[uuid]
@@ -174,7 +191,6 @@ function destroyCoin(uuid) {
 
 function hitObstacle() {
 	updateScoreEvent.destroy()
-	console.log('hitObstacle')
 }
 
 function hitCoin(player, coin) {

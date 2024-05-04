@@ -6,14 +6,23 @@ import { EVENTS } from '../constants'
 
 defineEmits(['destroy'])
 
+//
+// Refs
+//
 const scene = useScene()
 const obstacleRef = refObj()
 
+//
+// Watchers
+//
 const obstacleWatcher = watch(obstacleRef, value => {
 	value.body.setAllowGravity(false)
 	obstacleWatcher()
 })
 
+//
+// Methods
+//
 function onCreate(elem) {
 	scene.events.emit(EVENTS.CREATED_OBSTACLE, elem)
 }
